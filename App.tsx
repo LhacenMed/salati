@@ -12,6 +12,9 @@
 //   );
 // }
 
+
+
+import "./global.css";
 import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -88,8 +91,6 @@ export default function App() {
     InterSemi: Inter_600SemiBold,
     InterBold: Inter_700Bold,
     InterBlack: Inter_900Black,
-    // Amatic: AmaticSC_400Regular,
-    // AmaticBold: AmaticSC_700Bold,
   });
 
   useEffect(() => {

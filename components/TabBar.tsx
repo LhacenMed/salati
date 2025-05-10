@@ -187,12 +187,16 @@ export default function TabBar({ state, descriptors, navigation }: BottomTabBarP
   const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
 
   return blurEnabled ? (
-    <AnimatedBlurView
-      intensity={50}
-      tint="light"
-      style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
+    // <AnimatedBlurView
+    //   intensity={50}
+    //   tint="light"
+    //   experimentalBlurMethod="dimezisBlurView"
+    //   style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
+    //   {TabBarContent}
+    // </AnimatedBlurView>
+    <Animated.View style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
       {TabBarContent}
-    </AnimatedBlurView>
+    </Animated.View>
   ) : (
     <Animated.View style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
       {TabBarContent}

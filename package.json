@@ -11,13 +11,22 @@
         "web": "expo start --web"
     },
     "dependencies": {
+        "@expo-google-fonts/inter": "^0.3.0",
+        "@react-native-async-storage/async-storage": "^2.1.2",
+        "@react-navigation/bottom-tabs": "^7.3.12",
+        "@react-navigation/stack": "^7.3.1",
         "expo": "^53.0.9",
+        "expo-blur": "^14.1.4",
+        "expo-navigation-bar": "^4.2.4",
         "expo-status-bar": "~2.2.3",
+        "expo-system-ui": "^5.0.7",
         "nativewind": "latest",
         "react": "19.0.0",
         "react-native": "0.79.2",
+        "react-native-event-listeners": "^1.0.7",
         "react-native-reanimated": "~3.17.4",
-        "react-native-safe-area-context": "5.4.0"
+        "react-native-safe-area-context": "5.4.0",
+        "react-native-svg": "^15.11.2"
     },
     "devDependencies": {
         "@babel/core": "^7.20.0",
@@ -25,6 +34,7 @@
         "eslint": "^9.25.1",
         "eslint-config-expo": "^9.2.0",
         "eslint-config-prettier": "^10.1.2",
+        "expo-module-scripts": "^4.1.7",
         "prettier": "^3.2.5",
         "prettier-plugin-tailwindcss": "^0.5.11",
         "tailwindcss": "^3.4.0",

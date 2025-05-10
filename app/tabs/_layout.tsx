@@ -6,7 +6,7 @@ import {
 import TabBar from "../../components/TabBar";
 import Index from "./Index";
 import Explore from "./Explore";
-import Profile from "./Profile";
+import Bookings from "./Bookings";
 import Settings from "./Settings";
 import * as NavigationBar from "expo-navigation-bar";
 
@@ -47,7 +47,7 @@ export default function TabLayout() {
       />
       <Tab.Screen
         name="Bookings"
-        component={Profile}
+        component={Bookings}
         options={{ blurEnabled: true } as CustomTabNavigationOptions}
       />
       <Tab.Screen
