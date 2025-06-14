@@ -1,6 +1,6 @@
 {
     "cesVersion": "2.18.2",
-    "projectName": "rihleti",
+    "projectName": "Salati",
     "packages": [{
         "name": "nativewind",
         "type": "styling"

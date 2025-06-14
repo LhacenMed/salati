@@ -1,272 +1,163 @@
+import React, { useState } from "react";
 import {
-  Image,
-  StyleSheet,
+  View,
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  StyleSheet,
   ActivityIndicator,
+  Alert,
 } from "react-native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../firebase/config";
+import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
 
-import React, { useState } from "react";
-import { FIREBASE_AUTH } from "../../FirebaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+type AuthStackParamList = {
+  Welcome: undefined;
+  Login: undefined;
+  Signup: undefined;
+};
 
-import { colors } from "../utils/colors";
-import { fonts } from "../utils/fonts";
+type SignupScreenNavigationProp = StackNavigationProp<AuthStackParamList, "Signup">;
 
-import Ionicons from "react-native-vector-icons/Ionicons";
-import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { RootStackParamList } from "../types";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-// import { createUser } from "lib/appwrite";
-
-const SignupScreen = () => {
+export default function SignupScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [userName, setUserName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
-  const auth = FIREBASE_AUTH;
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const navigation = useNavigation<SignupScreenNavigationProp>();
 
-  const signUp = async () => {
-    setLoading(true);
+  const handleSignup = async () => {
+    if (!email || !password || !confirmPassword || !name) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert("Error", "Password should be at least 6 characters long");
+      return;
+    }
+
     try {
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
-      console.log(response);
-      alert("Check your emails!");
+      setLoading(true);
+      // Create the user account
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Create a user document in Firestore
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      await setDoc(userDocRef, {
+        name: name,
+        email: email,
+        createdAt: serverTimestamp(),
+      });
     } catch (error: any) {
-      console.log(error);
-      alert("Registration failed, " + error.message);
+      Alert.alert("Error", error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const [secureEntry, setSecureEntry] = useState(true);
-
-  const handleGoBack = () => {
-    navigation.goBack();
-    // navigation.navigate("Home");
-  };
-
-  const handleLogin = () => {
-    navigation.navigate("LOGIN");
-  };
-
-  const insets = useSafeAreaInsets();
-
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TouchableOpacity style={styles.backButtonWrapper} onPress={handleGoBack}>
-        <Ionicons
-          name={"arrow-back-outline"}
-          color={colors.primary}
-          size={25}
-        />
-      </TouchableOpacity>
-      <View style={styles.textContainer}>
-        <Text style={styles.headingText}>Let's get</Text>
-        <Text style={styles.headingText}>started</Text>
-      </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Create Account</Text>
 
-      {/* form  */}
+      <TextInput
+        style={styles.input}
+        placeholder="Name"
+        value={name}
+        onChangeText={setName}
+        autoCapitalize="words"
+      />
 
-      <View style={styles.formContainer}>
-        <View style={styles.inputContainer}>
-          <Ionicons name={"mail-outline"} size={30} color={colors.secondary} />
-          <TextInput
-            value={email}
-            style={styles.textInput}
-            placeholder="Enter your e-mail"
-            autoCapitalize="none"
-            placeholderTextColor={colors.secondary}
-            keyboardType="email-address"
-            onChangeText={(text) => setEmail(text)}
-          />
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        value={email}
+        onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
+      />
 
-        <View style={styles.inputContainer}>
-          <Ionicons
-            name={"person-circle-outline"}
-            size={30}
-            color={colors.secondary}
-          />
-          <TextInput
-            value={userName}
-            style={styles.textInput}
-            placeholder="Enter your full name"
-            placeholderTextColor={colors.secondary}
-            onChangeText={(text) => setUserName(text)}
-          />
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-        <View style={styles.inputContainer}>
-          <SimpleLineIcons name={"lock"} size={30} color={colors.secondary} />
-          <TextInput
-            value={password}
-            style={styles.textInput}
-            placeholder="Enter your password"
-            placeholderTextColor={colors.secondary}
-            onChangeText={(text) => setPassword(text)}
-            secureTextEntry={secureEntry}
-            keyboardType="number-pad" // Always set to number-pad
-          />
-          <TouchableOpacity
-            onPress={() => {
-              setSecureEntry((prev) => !prev);
-            }}
-          >
-            <Ionicons
-              name={secureEntry ? "eye" : "eye-off"}
-              size={20}
-              color={colors.secondary}
-            />
-          </TouchableOpacity>
-        </View>
+      <TextInput
+        style={styles.input}
+        placeholder="Confirm Password"
+        value={confirmPassword}
+        onChangeText={setConfirmPassword}
+        secureTextEntry
+      />
 
+      <TouchableOpacity style={styles.button} onPress={handleSignup} disabled={loading}>
         {loading ? (
-          <ActivityIndicator size="large" color="#45484A" />
+          <ActivityIndicator color="#fff" />
         ) : (
-          <>
-            <TouchableOpacity
-              style={styles.loginButtonWrapper}
-              onPress={signUp}
-            >
-              <Text style={styles.loginText}>Sign up</Text>
-            </TouchableOpacity>
-          </>
+          <Text style={styles.buttonText}>Sign Up</Text>
         )}
+      </TouchableOpacity>
 
-        <Text style={styles.continueText}>or continue with</Text>
-
-        <TouchableOpacity style={styles.googleButtonContainer}>
-          <Image
-            source={require("../../assets/google.png")}
-            style={styles.googleImage}
-          />
-          <Text style={styles.googleText}>Google</Text>
-        </TouchableOpacity>
-
-        {/* footer */}
-        <View style={styles.footerContainer}>
-          <Text style={styles.accountText}>Already have an account!</Text>
-          <TouchableOpacity onPress={handleLogin}>
-            <Text style={styles.signupText}>Login</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <TouchableOpacity style={styles.linkContainer} onPress={() => navigation.navigate("Login")}>
+        <Text style={styles.linkText}>Already have an account? Login</Text>
+      </TouchableOpacity>
     </View>
   );
-};
-
-export default SignupScreen;
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.white,
     padding: 20,
-  },
-  backButtonWrapper: {
-    height: 40,
-    width: 40,
-    backgroundColor: colors.gray,
-    borderRadius: 20,
     justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "#fff",
   },
-  textContainer: {
-    marginVertical: 20,
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 30,
+    textAlign: "center",
   },
-  headingText: {
-    fontSize: 32,
-    color: colors.primary,
-    fontFamily: fonts.SemiBold,
-  },
-  formContainer: {
-    marginTop: 20,
-  },
-  inputContainer: {
+  input: {
+    height: 50,
     borderWidth: 1,
-    borderColor: colors.secondary,
-    borderRadius: 100,
-    paddingHorizontal: 20,
-    flexDirection: "row",
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    fontSize: 16,
+  },
+  button: {
+    backgroundColor: "#007AFF",
+    height: 50,
+    borderRadius: 8,
+    justifyContent: "center",
     alignItems: "center",
-    padding: 2,
-    marginVertical: 10,
-  },
-  textInput: {
-    flex: 1,
-    paddingHorizontal: 10,
-    fontFamily: fonts.Light,
-  },
-  forgotPasswordText: {
-    textAlign: "right",
-    color: colors.primary,
-    fontFamily: fonts.SemiBold,
-    marginVertical: 10,
-  },
-  loginButtonWrapper: {
-    backgroundColor: colors.primary,
-    borderRadius: 100,
     marginTop: 20,
   },
-  loginText: {
-    color: colors.white,
-    fontSize: 20,
-    fontFamily: fonts.SemiBold,
-    textAlign: "center",
-    padding: 10,
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
   },
-  continueText: {
-    textAlign: "center",
-    marginVertical: 20,
-    fontSize: 14,
-    fontFamily: fonts.Regular,
-    color: colors.primary,
-  },
-  googleButtonContainer: {
-    flexDirection: "row",
-    borderWidth: 2,
-    borderColor: colors.primary,
-    borderRadius: 100,
-    justifyContent: "center",
+  linkContainer: {
+    marginTop: 20,
     alignItems: "center",
-    padding: 10,
-    gap: 10,
   },
-  googleImage: {
-    height: 20,
-    width: 20,
-  },
-  googleText: {
-    fontSize: 20,
-    fontFamily: fonts.SemiBold,
-  },
-  footerContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginVertical: 20,
-    gap: 5,
-  },
-  accountText: {
-    color: colors.primary,
-    fontFamily: fonts.Regular,
-  },
-  signupText: {
-    color: colors.primary,
-    fontFamily: fonts.Bold,
-    textDecorationLine: "underline",
+  linkText: {
+    color: "#007AFF",
+    fontSize: 16,
   },
 });

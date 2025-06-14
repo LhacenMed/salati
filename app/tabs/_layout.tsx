@@ -4,7 +4,7 @@ import {
   BottomTabNavigationOptions,
 } from "@react-navigation/bottom-tabs";
 import TabBar from "../../components/TabBar";
-import Index from "./Index";
+import Home from "./Home";
 import Explore from "./Explore";
 import Bookings from "./Bookings";
 import Settings from "./Settings";
@@ -37,7 +37,7 @@ export default function TabLayout() {
     >
       <Tab.Screen
         name="Home"
-        component={Index}
+        component={Home}
         options={{ blurEnabled: true } as CustomTabNavigationOptions}
       />
       <Tab.Screen

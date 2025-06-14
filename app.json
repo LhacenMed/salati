@@ -1,37 +1,63 @@
 {
     "expo": {
-        "name": "Rihleti",
-        "slug": "rihleti",
+        "name": "Salati",
+        "slug": "salati",
         "version": "1.0.0",
-
         "web": {
             "favicon": "./assets/favicon.png"
         },
-
         "experiments": {
             "tsconfigPaths": true
         },
-
-        "plugins": [],
-
+        "plugins": [
+            [
+                "expo-build-properties",
+                {
+                    "ios": {
+                        "useFrameworks": "static"
+                    }
+                }
+            ],
+            "@react-native-firebase/app",
+            "@react-native-firebase/auth"
+        ],
         "orientation": "portrait",
         "icon": "./assets/icon.png",
-
         "userInterfaceStyle": "light",
-
         "splash": {
             "image": "./assets/splash.png",
             "resizeMode": "contain",
             "backgroundColor": "#ffffff"
         },
+        "notification": {
+            "icon": "./assets/notification-icon.png",
+            "color": "#84cc16",
+            "iosDisplayInForeground": true,
+            "androidMode": "default",
+            "androidCollapsedTitle": "Prayer Time"
+        },
         "assetBundlePatterns": ["**/*"],
         "ios": {
-            "supportsTablet": true
+            "supportsTablet": true,
+            "bundleIdentifier": "com.salati.app",
+            "googleServicesFile": "./firebase/GoogleService-Info.plist"
         },
         "android": {
             "adaptiveIcon": {
                 "foregroundImage": "./assets/adaptive-icon.png",
                 "backgroundColor": "#ffffff"
+            },
+            "package": "com.salati.app",
+            "googleServicesFile": "./firebase/google-services.json",
+            "notification": {
+                "icon": "./assets/notification-icon/notification-icon.png",
+                "color": "#84cc16",
+                "androidMode": "default"
+            }
+        },
+        "extra": {
+            "eas": {
+                "projectId": "91df3abb-3577-4c4a-97e5-619576dff0f1"
             }
         }
     }
