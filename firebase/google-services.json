@@ -12,7 +12,20 @@
           "package_name": "com.salati.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "3227817482-ukkkbbvde4oebe43uk9ph6cai3631g21.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salati.app",
+            "certificate_hash": "c01971c8504fab69187de9b1be9fc041941d3866"
+          }
+        },
+        {
+          "client_id": "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAKcJgQL4xfmUhyQza-beYt2gYhXXE-FE0"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "3227817482-lcvruqi2f1fnr5tfqjum2so4gqic6kvk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.salati.app"
+              }
+            }
+          ]
         }
       }
     }

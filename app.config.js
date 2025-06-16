@@ -1,4 +1,4 @@
-{
+export default {
     "expo": {
         "name": "Salati",
         "slug": "salati",
@@ -19,7 +19,8 @@
                 }
             ],
             "@react-native-firebase/app",
-            "@react-native-firebase/auth"
+            "@react-native-firebase/auth",
+            "@react-native-google-signin/google-signin"
         ],
         "orientation": "portrait",
         "icon": "./assets/icon.png",
@@ -40,17 +41,20 @@
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.salati.app",
-            "googleServicesFile": "./firebase/GoogleService-Info.plist"
+            "googleServicesFile": process.env.GOOGLE_SERVICES_INFOPLIST,
+            "infoPlist": {
+                "ITSAppUsesNonExemptEncryption": false
+            }
         },
         "android": {
             "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
+                "foregroundImage": "./assets/icon.png",
                 "backgroundColor": "#ffffff"
             },
             "package": "com.salati.app",
-            "googleServicesFile": "./firebase/google-services.json",
+            "googleServicesFile": process.env.GOOGLE_SERVICES_JSON,
             "notification": {
-                "icon": "./assets/notification-icon/notification-icon.png",
+                "icon": "./assets/notification-icon.png",
                 "color": "#84cc16",
                 "androidMode": "default"
             }

@@ -9,6 +9,9 @@ import {
   Alert,
   Image,
   Switch,
+  Modal,
+  Dimensions,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -92,6 +95,7 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const [prayerTimes, setPrayerTimes] = useState<Record<
     PrayerName,
     { hour: number; minute: number }
@@ -432,22 +436,65 @@ export default function ProfileScreen() {
       ) : (
         <ScrollView style={styles.content}>
           <View style={styles.profileInfo}>
-            <TouchableOpacity
-              style={styles.avatarContainer}
-              onPress={pickImage}
-              disabled={uploading}
-            >
-              {uploading ? (
-                <ActivityIndicator size="large" color="#84cc16" />
-              ) : userData?.photoURL ? (
-                <Image source={{ uri: userData.photoURL }} style={styles.avatar} />
-              ) : (
-                <Ionicons name="person-circle" size={80} color="#84cc16" />
-              )}
-              <View style={styles.editIconContainer}>
+            <View style={[styles.avatarContainer]}>
+              <Pressable
+                onPress={() => (userData?.photoURL ? setShowImageModal(true) : pickImage())}
+                disabled={uploading}
+              >
+                {uploading ? (
+                  <ActivityIndicator size="large" color="#84cc16" />
+                ) : userData?.photoURL ? (
+                  <Image source={{ uri: userData.photoURL }} style={styles.avatar} />
+                ) : (
+                  <Ionicons name="person-circle" size={80} color="#84cc16" />
+                )}
+              </Pressable>
+
+              <Pressable
+                style={styles.editIconContainer}
+                onPress={pickImage}
+                disabled={uploading}
+              >
                 <Ionicons name="camera" size={20} color="#fff" />
+              </Pressable>
+            </View>
+
+            {/* Image Modal */}
+            <Modal
+              visible={showImageModal}
+              transparent={true}
+              onRequestClose={() => setShowImageModal(false)}
+              animationType="fade"
+            >
+              <View style={styles.modalOverlay}>
+                <View style={styles.modalContent}>
+                  <Image
+                    source={{ uri: userData?.photoURL }}
+                    style={styles.enlargedImage}
+                    resizeMode="contain"
+                  />
+                  <View style={styles.modalButtons}>
+                    <Pressable
+                      style={styles.modalButton}
+                      onPress={() => {
+                        setShowImageModal(false);
+                        pickImage();
+                      }}
+                    >
+                      <Ionicons name="camera" size={24} color="#fff" />
+                      <Text style={styles.modalButtonText}>Change Photo</Text>
+                    </Pressable>
+                    <Pressable
+                      style={[styles.modalButton, styles.closeButton]}
+                      onPress={() => setShowImageModal(false)}
+                    >
+                      <Ionicons name="close" size={24} color="#fff" />
+                      <Text style={styles.modalButtonText}>Close</Text>
+                    </Pressable>
+                  </View>
+                </View>
               </View>
-            </TouchableOpacity>
+            </Modal>
 
             <View style={styles.infoContainer}>
               <Text style={styles.label}>Name</Text>
@@ -573,6 +620,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderWidth: 3,
     borderColor: "#171717",
+    zIndex: 1,
   },
   infoContainer: {
     width: "100%",
@@ -634,5 +682,44 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginTop: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "100%",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  enlargedImage: {
+    width: Dimensions.get("window").width * 0.9,
+    height: Dimensions.get("window").width * 0.9,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 20,
+  },
+  modalButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#84cc16",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  closeButton: {
+    backgroundColor: "#dc2626",
+  },
+  modalButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });

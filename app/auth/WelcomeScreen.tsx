@@ -1,7 +1,8 @@
-import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
+import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
 
 type AuthStackParamList = {
   Welcome: undefined;
@@ -13,6 +14,38 @@ type WelcomeScreenNavigationProp = StackNavigationProp<AuthStackParamList, "Welc
 
 export default function WelcomeScreen() {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
+  const [error, setError] = useState<string | null>(null);
+  const [userInfo, setUserInfo] = useState<any>(null);
+
+  useEffect(() => {
+    GoogleSignin.configure({
+      webClientId: "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
+      // iosClientId: "430663825446-nbhh00udgfp0e79h4kg95b5cbdgqd7qj.apps.googleusercontent.com",
+      profileImageSize: 150,
+    });
+  }, []);
+
+  const signIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const user = await GoogleSignin.signIn();
+      setUserInfo(user);
+      setError(null);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await GoogleSignin.signOut();
+      await GoogleSignin.revokeAccess();
+      setUserInfo(null);
+      setError(null);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -32,6 +65,28 @@ export default function WelcomeScreen() {
         >
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>Login</Text>
         </TouchableOpacity>
+
+        <Text style={{ color: "red" }}>{JSON.stringify(error)}</Text>
+        {userInfo && (
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <Image source={{ uri: userInfo.user.photo }} style={{ width: 30, height: 30, borderRadius: 15 }} />
+            <Text style={{ color: "green" }}>{JSON.stringify(userInfo.user)}</Text>
+          </View>
+          )}
+
+        <GoogleSigninButton
+          size={GoogleSigninButton.Size.Standard}
+          color={GoogleSigninButton.Color.Dark}
+          onPress={signIn}
+        />
+
+        {userInfo && (<TouchableOpacity
+          style={[styles.button, styles.secondaryButton]}
+          onPress={signOut}
+        >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Sign Out</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

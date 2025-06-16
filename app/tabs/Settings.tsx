@@ -3,34 +3,14 @@ import { View, Text, StyleSheet, SafeAreaView, StatusBar, ScrollView } from "rea
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import MenuItem from "../../components/ui/MenuItem";
 import ColorSchemePopup from "../../components/ui/ColorSchemePopup";
-import LanguagePopup from "../../components/ui/LanguagePopup";
 import { ThemeContext } from "context/ThemeContext";
 import { ThemeMode } from "context/ThemeContext";
-import { translations as en } from "../../translations/en";
-import { translations as fr } from "../../translations/fr";
-import { translations as ar } from "../../translations/ar";
-import { translations as es } from "../../translations/es";
-import { translations as de } from "../../translations/de";
-import { translations as it } from "../../translations/it";
 import { auth } from "firebase/config";
 
 const Page = () => {
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("English");
   const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
-  const [languageModalVisible, setLanguageModalVisible] = useState(false);
   const themes = useContext(ThemeContext);
-
-  const translationsMap: Record<string, typeof en> = {
-    English: en,
-    French: fr,
-    Arabic: ar,
-    Spanish: es,
-    German: de,
-    Italian: it,
-  };
-
-  const selectedTranslations = translationsMap[selectedLanguage];
 
   const backgroundColor = themes.theme === "dark" ? "#171717" : "rgb(249, 249, 249)";
   const headerTextColor = themes.theme === "dark" ? "rgb(249, 249, 249)" : "#171717";
@@ -38,11 +18,6 @@ const Page = () => {
   const handleColorSchemeSelect = (scheme: string) => {
     // Update the theme when a new scheme is selected
     themes.toggleTheme(scheme as ThemeMode);
-  };
-
-  const handleLanguageSelect = (language: string) => {
-    // Handle language selection logic here
-    console.log(`Selected language: ${language}`);
   };
 
   return (
@@ -55,7 +30,7 @@ const Page = () => {
         <View style={styles.headerLeftContainer} />
         <View style={styles.headerTitleContainer}>
           <Text style={[styles.headerTitle, { color: headerTextColor }]}>
-            {selectedTranslations.settings}
+            Settings
           </Text>
         </View>
         <View style={styles.headerRightContainer} />
@@ -67,11 +42,11 @@ const Page = () => {
         scrollEnabled={!modalVisible}
       >
         {/* Profile Section */}
-        <Text style={styles.firstSectionTitle}>{selectedTranslations.profile}</Text>
+        <Text style={styles.firstSectionTitle}>Profile</Text>
         <View style={styles.section}>
           <MenuItem
             icon="mail-outline"
-            title={selectedTranslations.email}
+            title="Email"
             value="217acenmed653@gmail.com"
             isFirst
             isLast={false}
@@ -80,7 +55,7 @@ const Page = () => {
           />
           <MenuItem
             icon="logo-google"
-            title={selectedTranslations.google}
+            title="Google"
             value="Connected"
             isFirst={false}
             isLast
@@ -89,17 +64,17 @@ const Page = () => {
           />
         </View>
         {/* About Section */}
-        <Text style={styles.sectionTitle}>{selectedTranslations.about}</Text>
+        <Text style={styles.sectionTitle}>About</Text>
         <View style={styles.section}>
           <MenuItem
             icon="document-text-outline"
-            title={selectedTranslations.termsOfUse}
+            title="Terms of Use"
             isFirst
             isLast={false}
           />
           <MenuItem
             icon="shield-outline"
-            title={selectedTranslations.privacyPolicy}
+            title="Privacy Policy"
             value=""
             isFirst={false}
             isLast={false}
@@ -108,7 +83,7 @@ const Page = () => {
           />
           <MenuItem
             icon="information-circle-outline"
-            title={selectedTranslations.checkForUpdates}
+            title="Check for updates"
             value="1.0.11(48)"
             isFirst={false}
             isLast
@@ -117,7 +92,7 @@ const Page = () => {
           />
         </View>
         {/* App Section */}
-        <Text style={styles.sectionTitle}>{selectedTranslations.app}</Text>
+        <Text style={styles.sectionTitle}>App</Text>
         <View style={styles.section}>
           <MenuItem
             icon={
@@ -129,7 +104,7 @@ const Page = () => {
                   ? "moon-outline"
                   : "sunny-outline"
             }
-            title={selectedTranslations.colorScheme}
+            title="Color Scheme"
             value={themes.mode.charAt(0).toUpperCase() + themes.mode.slice(1)}
             isFirst
             isLast={false}
@@ -139,20 +114,19 @@ const Page = () => {
           />
           <MenuItem
             icon="earth"
-            title={selectedTranslations.appLanguage}
+            title="App Language"
             value="English"
             isFirst={false}
             isLast
             showValue={true}
-            showChevron={true}
-            onPress={() => setLanguageModalVisible(true)}
+            showChevron={false}
           />
         </View>
         {/* Contact Section */}
         <View style={styles.miniSection}>
           <MenuItem
             icon="chatbubble-outline"
-            title={selectedTranslations.contactUs}
+            title="Contact Us"
             isFirst
             isLast
           />
@@ -161,7 +135,7 @@ const Page = () => {
         <View style={styles.miniSection}>
           <MenuItem
             icon="log-out-outline"
-            title={selectedTranslations.logOut}
+            title="Log Out"
             isDanger
             isFirst
             showChevron={false}
@@ -171,23 +145,18 @@ const Page = () => {
           />
           <MenuItem
             icon="person-remove-outline"
-            title={selectedTranslations.deleteAccount}
+            title="Delete Account"
             isDanger
             isLast
             showChevron={false}
           />
         </View>
-        <Text style={styles.footerText}>{selectedTranslations.footerText}</Text>
+        <Text style={styles.footerText}>Footer Text</Text>
       </ScrollView>
       <ColorSchemePopup
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSelect={handleColorSchemeSelect}
-      />
-      <LanguagePopup
-        visible={languageModalVisible}
-        onClose={() => setLanguageModalVisible(false)}
-        onSelect={handleLanguageSelect}
       />
     </SafeAreaView>
   );
