@@ -129,7 +129,8 @@ export default function ProfileScreen() {
         dhuhr: convertTimeStringToObject(data.data.timings.Dhuhr),
         asr: convertTimeStringToObject(data.data.timings.Asr),
         maghrib: convertTimeStringToObject(data.data.timings.Maghrib),
-        isha: convertTimeStringToObject(data.data.timings.Isha),
+        // isha: convertTimeStringToObject(data.data.timings.Isha),
+        isha: convertTimeStringToObject("22:44"),
       };
 
       setPrayerTimes(convertedTimes);
@@ -302,7 +303,7 @@ export default function ProfileScreen() {
           },
         });
 
-        console.log(`Scheduled ${prayer} notification for ${time.hour}:${time.minute}`);
+        // console.log(`Scheduled ${prayer} notification for ${time.hour}:${time.minute}`);
       }
 
       // Set notification categories with actions

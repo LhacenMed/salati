@@ -6,12 +6,13 @@ import ColorSchemePopup from "../../components/ui/ColorSchemePopup";
 import { ThemeContext } from "context/ThemeContext";
 import { ThemeMode } from "context/ThemeContext";
 import { auth } from "firebase/config";
+import { useAuth } from "../hooks/useAuth";
 
 const Page = () => {
   const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const themes = useContext(ThemeContext);
-
+  const { user } = useAuth();
   const backgroundColor = themes.theme === "dark" ? "#171717" : "rgb(249, 249, 249)";
   const headerTextColor = themes.theme === "dark" ? "rgb(249, 249, 249)" : "#171717";
 
@@ -29,9 +30,7 @@ const Page = () => {
       <View style={[styles.header, { top: insets.top, backgroundColor: backgroundColor }]}>
         <View style={styles.headerLeftContainer} />
         <View style={styles.headerTitleContainer}>
-          <Text style={[styles.headerTitle, { color: headerTextColor }]}>
-            Settings
-          </Text>
+          <Text style={[styles.headerTitle, { color: headerTextColor }]}>Settings</Text>
         </View>
         <View style={styles.headerRightContainer} />
       </View>
@@ -47,7 +46,7 @@ const Page = () => {
           <MenuItem
             icon="mail-outline"
             title="Email"
-            value="217acenmed653@gmail.com"
+            value={user?.email || "No email"}
             isFirst
             isLast={false}
             showValue={true}
@@ -56,7 +55,7 @@ const Page = () => {
           <MenuItem
             icon="logo-google"
             title="Google"
-            value="Connected"
+            value={user?.email?.endsWith("@gmail.com") ? "Connected" : "Not connected"}
             isFirst={false}
             isLast
             showValue={true}
@@ -66,12 +65,7 @@ const Page = () => {
         {/* About Section */}
         <Text style={styles.sectionTitle}>About</Text>
         <View style={styles.section}>
-          <MenuItem
-            icon="document-text-outline"
-            title="Terms of Use"
-            isFirst
-            isLast={false}
-          />
+          <MenuItem icon="document-text-outline" title="Terms of Use" isFirst isLast={false} />
           <MenuItem
             icon="shield-outline"
             title="Privacy Policy"
@@ -124,12 +118,7 @@ const Page = () => {
         </View>
         {/* Contact Section */}
         <View style={styles.miniSection}>
-          <MenuItem
-            icon="chatbubble-outline"
-            title="Contact Us"
-            isFirst
-            isLast
-          />
+          <MenuItem icon="chatbubble-outline" title="Contact Us" isFirst isLast />
         </View>
         {/* Danger Zone */}
         <View style={styles.miniSection}>

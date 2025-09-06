@@ -7,6 +7,58 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:3227817482:android:e09b01dac110f1a3b7b1f3",
+        "android_client_info": {
+          "package_name": "com.googly.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "3227817482-pv2v1rn137g23s9csb91iqacj9cnofqh.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.googly.app",
+            "certificate_hash": "3270d2011821c702e4edc6804d85fb91110fd920"
+          }
+        },
+        {
+          "client_id": "3227817482-q9mkmp10pe9gp2ma6ftccjkcfon8ro0o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.googly.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAKcJgQL4xfmUhyQza-beYt2gYhXXE-FE0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "3227817482-lcvruqi2f1fnr5tfqjum2so4gqic6kvk.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.salati.app"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:3227817482:android:b777e9672f390af5b7b1f3",
         "android_client_info": {
           "package_name": "com.salati.app"
@@ -14,11 +66,19 @@
       },
       "oauth_client": [
         {
-          "client_id": "3227817482-ukkkbbvde4oebe43uk9ph6cai3631g21.apps.googleusercontent.com",
+          "client_id": "3227817482-7cjgncjmlrqeblkgmtvo59svqfgmcoug.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.salati.app",
-            "certificate_hash": "c01971c8504fab69187de9b1be9fc041941d3866"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "3227817482-r42aaj5oh66hqagaqghmgamllo54svfn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.salati.app",
+            "certificate_hash": "0f98dba2a89cc379c75f5122209a010478507660"
           }
         },
         {

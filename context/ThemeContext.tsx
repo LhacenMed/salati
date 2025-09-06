@@ -28,7 +28,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
       const savedTheme = (await AsyncStorage.getItem(
         "selectedTheme"
       )) as ThemeMode | null;
-      console.log("Saved theme retrieved:", savedTheme);
+      // console.log("Saved theme retrieved:", savedTheme);
       if (
         savedTheme === "light" ||
         savedTheme === "dark" ||
@@ -43,10 +43,10 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   const applyTheme = (selectedMode: ThemeMode) => {
-    console.log("applyTheme called with mode:", selectedMode);
+    // console.log("applyTheme called with mode:", selectedMode);
     if (selectedMode === "system") {
       const systemTheme = Appearance.getColorScheme();
-      console.log("System theme detected:", systemTheme);
+      // console.log("System theme detected:", systemTheme);
       setTheme(systemTheme || "light");
     } else {
       setTheme(selectedMode);
@@ -56,21 +56,21 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const toggleTheme = (newMode: ThemeMode) => {
-    console.log("toggleTheme called with mode:", newMode);
+    // console.log("toggleTheme called with mode:", newMode);
     applyTheme(newMode);
   };
 
   // Initialize theme on mount and listen for changes
   useEffect(() => {
-    console.log("Current mode:", mode);
-    console.log("Current theme:", theme);
+    // console.log("Current mode:", mode);
+    // console.log("Current theme:", theme);
 
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      console.log("System theme changed to:", colorScheme);
+      // console.log("System theme changed to:", colorScheme);
       if (mode === "system") {
         setTimeout(() => {
           const updatedTheme = Appearance.getColorScheme();
-          console.log("Updated system theme after delay:", updatedTheme);
+          // console.log("Updated system theme after delay:", updatedTheme);
           setTheme(updatedTheme || "light");
         }, 100); // Delay of 100ms
       }

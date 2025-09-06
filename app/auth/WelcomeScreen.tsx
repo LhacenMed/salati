@@ -3,6 +3,10 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
+import { signInWithCredential, GoogleAuthProvider, signOut } from "firebase/auth";
+import { auth, db } from "../../firebase/config";
+import { useAuth } from "../hooks/useAuth";
+import { doc, setDoc, serverTimestamp, getDoc } from "firebase/firestore";
 
 type AuthStackParamList = {
   Welcome: undefined;
@@ -14,36 +18,71 @@ type WelcomeScreenNavigationProp = StackNavigationProp<AuthStackParamList, "Welc
 
 export default function WelcomeScreen() {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
-  const [error, setError] = useState<string | null>(null);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const { user } = useAuth();
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [isSignUp, setIsSignUp] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: "3227817482-pohntsk5t090q6p3mb95mk1voicdmg1j.apps.googleusercontent.com",
       // iosClientId: "430663825446-nbhh00udgfp0e79h4kg95b5cbdgqd7qj.apps.googleusercontent.com",
+      scopes: ["email", "profile"],
       profileImageSize: 150,
     });
   }, []);
 
-  const signIn = async () => {
+  async function onGoogleButtonPress() {
     try {
-      await GoogleSignin.hasPlayServices();
-      const user = await GoogleSignin.signIn();
-      setUserInfo(user);
-      setError(null);
-    } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
-    }
-  };
-
-  const signOut = async () => {
-    try {
+      // Sign out from any existing Google session
       await GoogleSignin.signOut();
-      await GoogleSignin.revokeAccess();
-      setUserInfo(null);
-      setError(null);
+
+      // Check if device supports Google Play Services
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+
+      // Get the users ID token
+      const signInResult = await GoogleSignin.signIn();
+      const { idToken } = await GoogleSignin.getTokens();
+
+      // Create a Google credential with the token
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+
+      // Sign-in the user with the credential
+      const userCredential = await signInWithCredential(auth, googleCredential);
+
+      // Check if this is a new user by trying to get their document
+      const userDocRef = doc(db, "users", userCredential.user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      // If the document doesn't exist, create it
+      if (!userDoc.exists()) {
+        await setDoc(userDocRef, {
+          name: userCredential.user.displayName || "",
+          email: userCredential.user.email || "",
+          photoURL: userCredential.user.photoURL || "",
+          createdAt: serverTimestamp(),
+          provider: "google",
+        });
+      }
+
+      return userCredential;
     } catch (error) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      console.error("Google Sign-In Error:", error);
+      // You might want to show an error message to the user here
+    }
+  }
+
+  // Handles sign-out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      await GoogleSignin.signOut();
+      setLoggedIn(false);
+      setEmail("");
+      setPassword("");
+    } catch (error) {
+      console.error("Sign Out Error:", error);
     }
   };
 
@@ -66,24 +105,32 @@ export default function WelcomeScreen() {
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>Login</Text>
         </TouchableOpacity>
 
-        <Text style={{ color: "red" }}>{JSON.stringify(error)}</Text>
-        {userInfo && (
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <Image source={{ uri: userInfo.user.photo }} style={{ width: 30, height: 30, borderRadius: 15 }} />
-            <Text style={{ color: "green" }}>{JSON.stringify(userInfo.user)}</Text>
+        {user && (
+          <View
+            style={{ flexDirection: "column", alignItems: "center", marginBottom: 10, gap: 10 }}
+          >
+            <Image
+              source={{ uri: user.photoURL || "" }}
+              style={{ width: 30, height: 30, borderRadius: 15 }}
+            />
+            <Text style={{ color: "green" }}>Name: {user.displayName}</Text>
+            <Text style={{ color: "green" }}>Email: {user.email}</Text>
+            <Text style={{ color: "green" }}>UID: {user.uid}</Text>
+            <Text style={{ color: "green" }}>
+              Phone number: {user.phoneNumber ? user.phoneNumber : "Null"}
+            </Text>
+            <Text style={{ color: "green" }}>Provider ID: {user.providerId}</Text>
           </View>
-          )}
+        )}
 
         <GoogleSigninButton
-          size={GoogleSigninButton.Size.Standard}
+          size={GoogleSigninButton.Size.Wide}
           color={GoogleSigninButton.Color.Dark}
-          onPress={signIn}
+          onPress={onGoogleButtonPress}
         />
 
-        {userInfo && (<TouchableOpacity
-          style={[styles.button, styles.secondaryButton]}
-          onPress={signOut}
-        >
+        {user && (
+          <TouchableOpacity style={[styles.button, styles.secondaryButton]} onPress={handleSignOut}>
             <Text style={[styles.buttonText, styles.secondaryButtonText]}>Sign Out</Text>
           </TouchableOpacity>
         )}
