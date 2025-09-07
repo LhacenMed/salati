@@ -17,8 +17,8 @@ import PrayerCard from "../../components/ui/PrayerCard";
 import PrayerProgress from "../../components/ui/PrayerProgress";
 import { useNavigation } from "@react-navigation/native";
 import type { StackNavigationProp } from "@react-navigation/stack";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+// import { getAuth } from "firebase/auth";
+// import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 type RootStackParamList = {
   Inside: undefined;
@@ -36,19 +36,19 @@ export default function Page() {
   const [progressKey, setProgressKey] = useState(0);
   const [userPhotoURL, setUserPhotoURL] = useState<string | null>(null);
   const navigation = useNavigation<NavigationProp>();
-  const auth = getAuth();
-  const firestore = getFirestore();
+  // const auth = getAuth();
+  // const firestore = getFirestore();
 
   useEffect(() => {
     const fetchUserPhoto = async () => {
       try {
-        const user = auth.currentUser;
-        if (!user) return;
+        // const user = auth.currentUser;
+        // if (!user) return;
 
-        const userDoc = await getDoc(doc(firestore, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().photoURL) {
-          setUserPhotoURL(userDoc.data().photoURL);
-        }
+        // const userDoc = await getDoc(doc(firestore, "users", user.uid));
+        // if (userDoc.exists() && userDoc.data().photoURL) {
+        //   setUserPhotoURL(userDoc.data().photoURL);
+        // }
       } catch (error) {
         console.error("Error fetching user photo:", error);
       }
@@ -66,13 +66,13 @@ export default function Page() {
     setRefreshing(true);
     try {
       // Fetch user photo
-      const user = auth.currentUser;
-      if (user) {
-        const userDoc = await getDoc(doc(firestore, "users", user.uid));
-        if (userDoc.exists() && userDoc.data().photoURL) {
-          setUserPhotoURL(userDoc.data().photoURL);
-        }
-      }
+      // const user = auth.currentUser;
+      // if (user) {
+      //   const userDoc = await getDoc(doc(firestore, "users", user.uid));
+      //   if (userDoc.exists() && userDoc.data().photoURL) {
+      //     setUserPhotoURL(userDoc.data().photoURL);
+      //   }
+      // }
       // Force re-render PrayerProgress by changing its key
       setProgressKey((prev) => prev + 1);
     } catch (error) {
@@ -80,7 +80,8 @@ export default function Page() {
     } finally {
       setRefreshing(false);
     }
-  }, [auth, firestore]);
+  // }, [auth, firestore]);
+  }, []);
 
   return (
     <SafeAreaView style={{ paddingTop: insets.top }} className="flex-1 bg-[#171717]">

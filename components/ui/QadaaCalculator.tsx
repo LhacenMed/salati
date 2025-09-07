@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Modal, Platform, StyleSheet, Alert } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../../firebase/config";
+// import { doc, setDoc } from "firebase/firestore";
+// import { auth, db } from "../../firebase/config";
 
 interface DateRange {
   startDate: Date;
@@ -41,11 +41,11 @@ export default function QadaaCalculator({ onDataCreated }: { onDataCreated: () =
 
   const createQadaaData = async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        Alert.alert("Error", "User not authenticated");
-        return;
-      }
+      // const user = auth.currentUser;
+      // if (!user) {
+      //   Alert.alert("Error", "User not authenticated");
+      //   return;
+      // }
 
       if (dateRange.endDate < dateRange.startDate) {
         Alert.alert("Error", "End date cannot be before start date");
@@ -55,27 +55,27 @@ export default function QadaaCalculator({ onDataCreated }: { onDataCreated: () =
       setLoading(true);
       const days = calculateDays(dateRange.startDate, dateRange.endDate);
 
-      const userDocRef = doc(db, "users", user.uid);
-      await setDoc(
-        userDocRef,
-        {
-          progress: {
-            fajr: { done: 0, total: days },
-            dhuhr: { done: 0, total: days },
-            asr: { done: 0, total: days },
-            maghrib: { done: 0, total: days },
-            isha: { done: 0, total: days },
-          },
-          qadaaInfo: {
-            startDate: dateRange.startDate.toISOString(),
-            endDate: dateRange.endDate.toISOString(),
-            totalDays: days,
-            totalPrayers: days * 5,
-            createdAt: new Date().toISOString(),
-          },
-        },
-        { merge: true }
-      );
+      // const userDocRef = doc(db, "users", user.uid);
+      // await setDoc(
+      //   userDocRef,
+      //   {
+      //     progress: {
+      //       fajr: { done: 0, total: days },
+      //       dhuhr: { done: 0, total: days },
+      //       asr: { done: 0, total: days },
+      //       maghrib: { done: 0, total: days },
+      //       isha: { done: 0, total: days },
+      //     },
+      //     qadaaInfo: {
+      //       startDate: dateRange.startDate.toISOString(),
+      //       endDate: dateRange.endDate.toISOString(),
+      //       totalDays: days,
+      //       totalPrayers: days * 5,
+      //       createdAt: new Date().toISOString(),
+      //     },
+      //   },
+      //   { merge: true }
+      // );
 
       Alert.alert("Success", `Created Qadaa data for ${days} days.`, [
         {

@@ -16,24 +16,24 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { getAuth } from "firebase/auth";
-import { getFirestore, doc, getDoc, updateDoc, Timestamp, increment } from "firebase/firestore";
+// import { getAuth } from "firebase/auth";
+// import { getFirestore, doc, getDoc, updateDoc, Timestamp, increment } from "firebase/firestore";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from "expo-image-picker";
-import * as Notifications from "expo-notifications";
+// import * as Notifications from "expo-notifications";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME, NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET } from "@env";
 
 // Configure notifications
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: true,
+//     shouldSetBadge: false,
+//     shouldShowBanner: true,
+//     shouldShowList: true,
+//   }),
+// });
 
 type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
@@ -49,7 +49,7 @@ type UserProgress = {
 interface UserData {
   email: string;
   name: string;
-  createdAt: Timestamp;
+  // createdAt: Timestamp;
   photoURL?: string;
   progress?: Partial<UserProgress>;
   qadaaInfo?: {
@@ -100,8 +100,8 @@ export default function ProfileScreen() {
     PrayerName,
     { hour: number; minute: number }
   > | null>(null);
-  const auth = getAuth();
-  const firestore = getFirestore();
+  // const auth = getAuth();
+  // const firestore = getFirestore();
 
   // Cloudinary configuration using environment variables
   const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
@@ -172,94 +172,94 @@ export default function ProfileScreen() {
   }, []);
 
   // Add notification response handler for marking prayers as done
-  useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener(async (response) => {
-      try {
-        const actionId = response.actionIdentifier;
-        if (actionId !== "MARK_AS_DONE") return;
+  // useEffect(() => {
+  //   const subscription = Notifications.addNotificationResponseReceivedListener(async (response) => {
+  //     try {
+  //       const actionId = response.actionIdentifier;
+  //       if (actionId !== "MARK_AS_DONE") return;
 
-        const prayer = response.notification.request.content.data?.prayer;
-        if (!prayer || typeof prayer !== "string" || !(prayer in PRAYER_NAMES)) {
-          console.error("Invalid prayer type received:", prayer);
-          return;
-        }
+  //       const prayer = response.notification.request.content.data?.prayer;
+  //       if (!prayer || typeof prayer !== "string" || !(prayer in PRAYER_NAMES)) {
+  //         console.error("Invalid prayer type received:", prayer);
+  //         return;
+  //       }
 
-        const user = auth.currentUser;
-        if (!user) {
-          console.error("No user logged in");
-          return;
-        }
+  //       const user = auth.currentUser;
+  //       if (!user) {
+  //         console.error("No user logged in");
+  //         return;
+  //       }
 
-        const userRef = doc(firestore, "users", user.uid);
+  //       const userRef = doc(firestore, "users", user.uid);
 
-        // Get current user data
-        const userDoc = await getDoc(userRef);
-        if (!userDoc.exists()) {
-          console.error("User document not found");
-          return;
-        }
+  //       // Get current user data
+  //       const userDoc = await getDoc(userRef);
+  //       if (!userDoc.exists()) {
+  //         console.error("User document not found");
+  //         return;
+  //       }
 
-        const currentData = userDoc.data();
+  //       const currentData = userDoc.data();
 
-        // If progress structure doesn't exist, initialize it
-        if (!currentData.progress || !currentData.progress[prayer as PrayerName]) {
-          await updateDoc(userRef, {
-            [`progress.${prayer}`]: {
-              total: currentData.progress?.[prayer as PrayerName]?.total || 30,
-              done: currentData.progress?.[prayer as PrayerName]?.done || 0,
-            },
-          });
-        }
+  //       // If progress structure doesn't exist, initialize it
+  //       if (!currentData.progress || !currentData.progress[prayer as PrayerName]) {
+  //         await updateDoc(userRef, {
+  //           [`progress.${prayer}`]: {
+  //             total: currentData.progress?.[prayer as PrayerName]?.total || 30,
+  //             done: currentData.progress?.[prayer as PrayerName]?.done || 0,
+  //           },
+  //         });
+  //       }
 
-        // Increment the done count
-        await updateDoc(userRef, {
-          [`progress.${prayer}.done`]: increment(1),
-        });
+  //       // Increment the done count
+  //       await updateDoc(userRef, {
+  //         [`progress.${prayer}.done`]: increment(1),
+  //       });
 
-        // Refresh user data to show updated progress
-        const updatedDoc = await getDoc(userRef);
-        if (updatedDoc.exists()) {
-          const newData = updatedDoc.data() as UserData;
-          setUserData(newData);
+  //       // Refresh user data to show updated progress
+  //       const updatedDoc = await getDoc(userRef);
+  //       if (updatedDoc.exists()) {
+  //         const newData = updatedDoc.data() as UserData;
+  //         setUserData(newData);
 
-          // Show current progress in the success message
-          const prayerProgress = newData.progress?.[prayer as PrayerName];
-          Alert.alert(
-            "Prayer Marked as Done",
-            `${PRAYER_NAMES[prayer as PrayerName]} prayer has been marked as completed (${prayerProgress?.done}/${prayerProgress?.total}). May Allah accept your prayers.`
-          );
-        }
-      } catch (error) {
-        console.error("Error in notification response handler:", error);
-        Alert.alert("Error", "Failed to mark prayer as done. Please try again.");
-      }
-    });
+  //         // Show current progress in the success message
+  //         const prayerProgress = newData.progress?.[prayer as PrayerName];
+  //         Alert.alert(
+  //           "Prayer Marked as Done",
+  //           `${PRAYER_NAMES[prayer as PrayerName]} prayer has been marked as completed (${prayerProgress?.done}/${prayerProgress?.total}). May Allah accept your prayers.`
+  //         );
+  //       }
+  //     } catch (error) {
+  //       console.error("Error in notification response handler:", error);
+  //       Alert.alert("Error", "Failed to mark prayer as done. Please try again.");
+  //     }
+  //   });
 
-    return () => {
-      subscription.remove();
-    };
-  }, [auth, firestore]);
+  //   return () => {
+  //     subscription.remove();
+  //   };
+  // }, [auth, firestore]);
 
   // Modified toggleNotifications to use fetched prayer times
   const toggleNotifications = async (value: boolean) => {
     try {
       if (value) {
-        const { status } = await Notifications.requestPermissionsAsync();
-        if (status !== "granted") {
-          Alert.alert(
-            "Permission Required",
-            "Please enable notifications in your device settings to receive prayer time reminders."
-          );
-          return;
-        }
+        // const { status } = await Notifications.requestPermissionsAsync();
+        // if (status !== "granted") {
+        //   Alert.alert(
+        //     "Permission Required",
+        //     "Please enable notifications in your device settings to receive prayer time reminders."
+        //   );
+        //   return;
+        // }
 
-        // Fetch fresh prayer times when enabling notifications
-        const times = await fetchPrayerTimes();
-        if (times) {
-          await schedulePrayerNotifications(times);
-        }
+        // // Fetch fresh prayer times when enabling notifications
+        // const times = await fetchPrayerTimes();
+        // if (times) {
+        //   await schedulePrayerNotifications(times);
+        // }
       } else {
-        await Notifications.cancelAllScheduledNotificationsAsync();
+        // await Notifications.cancelAllScheduledNotificationsAsync();
       }
 
       setNotificationsEnabled(value);
@@ -275,7 +275,7 @@ export default function ProfileScreen() {
   ) => {
     try {
       // First, cancel any existing scheduled notifications
-      await Notifications.cancelAllScheduledNotificationsAsync();
+      // await Notifications.cancelAllScheduledNotificationsAsync();
 
       // Schedule notifications for each prayer
       for (const [prayer, time] of Object.entries(times)) {
@@ -288,35 +288,35 @@ export default function ProfileScreen() {
           trigger.setDate(trigger.getDate() + 1);
         }
 
-        const notificationId = await Notifications.scheduleNotificationAsync({
-          content: {
-            title: `🕌 Time for ${PRAYER_NAMES[prayer as PrayerName]} Prayer`,
-            body: `It's time to pray ${PRAYER_NAMES[prayer as PrayerName]}.`,
-            data: { prayer },
-            categoryIdentifier: "prayers",
-            sound: true,
-          },
-          trigger: {
-            hour: time.hour,
-            minute: time.minute,
-            type: Notifications.SchedulableTriggerInputTypes.DAILY,
-          },
-        });
+        // const notificationId = await Notifications.scheduleNotificationAsync({
+        //   content: {
+        //     title: `🕌 Time for ${PRAYER_NAMES[prayer as PrayerName]} Prayer`,
+        //     body: `It's time to pray ${PRAYER_NAMES[prayer as PrayerName]}.`,
+        //     data: { prayer },
+        //     categoryIdentifier: "prayers",
+        //     sound: true,
+        //   },
+        //   trigger: {
+        //     hour: time.hour,
+        //     minute: time.minute,
+        //     type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        //   },
+        // });
 
         // console.log(`Scheduled ${prayer} notification for ${time.hour}:${time.minute}`);
       }
 
       // Set notification categories with actions
-      await Notifications.setNotificationCategoryAsync("prayers", [
-        {
-          identifier: "MARK_AS_DONE",
-          buttonTitle: "Mark as Done",
-          options: {
-            isDestructive: false,
-            isAuthenticationRequired: false,
-          },
-        },
-      ]);
+      // await Notifications.setNotificationCategoryAsync("prayers", [
+      //   {
+      //     identifier: "MARK_AS_DONE",
+      //     buttonTitle: "Mark as Done",
+      //     options: {
+      //       isDestructive: false,
+      //       isAuthenticationRequired: false,
+      //     },
+      //   },
+      // ]);
     } catch (error) {
       console.error("Error scheduling prayer notifications:", error);
       throw error;
@@ -348,7 +348,7 @@ export default function ProfileScreen() {
   };
 
   const uploadImage = async (uri: string) => {
-    if (!auth.currentUser) return;
+    // if (!auth.currentUser) return;
 
     setUploading(true);
     try {
@@ -371,10 +371,10 @@ export default function ProfileScreen() {
 
       if (data.secure_url) {
         // Update Firestore with new photo URL
-        const userRef = doc(firestore, "users", auth.currentUser.uid);
-        await updateDoc(userRef, {
-          photoURL: data.secure_url,
-        });
+        // const userRef = doc(firestore, "users", auth.currentUser.uid);
+        // await updateDoc(userRef, {
+        //   photoURL: data.secure_url,
+        // });
 
         // Update local state
         setUserData((prev) => (prev ? { ...prev, photoURL: data.secure_url } : null));
@@ -390,19 +390,19 @@ export default function ProfileScreen() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const user = auth.currentUser;
-        if (!user) return;
+        // const user = auth.currentUser;
+        // if (!user) return;
 
-        const userDoc = await getDoc(doc(firestore, "users", user.uid));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data() as UserData);
-        } else {
-          setUserData({
-            email: user.email || "",
-            name: user.displayName || "Not set",
-            createdAt: Timestamp.fromDate(new Date()),
-          });
-        }
+        // const userDoc = await getDoc(doc(firestore, "users", user.uid));
+        // if (userDoc.exists()) {
+        //   setUserData(userDoc.data() as UserData);
+        // } else {
+        //   setUserData({
+        //     email: user.email || "",
+        //     name: user.displayName || "Not set",
+        //     createdAt: Timestamp.fromDate(new Date()),
+        //   });
+        // }
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -415,7 +415,7 @@ export default function ProfileScreen() {
 
   const handleSignOut = async () => {
     try {
-      await auth.signOut();
+      // await auth.signOut();
     } catch (error) {
       console.error("Error signing out:", error);
     }
@@ -506,9 +506,9 @@ export default function ProfileScreen() {
 
               <Text style={styles.label}>Member Since</Text>
               <Text style={styles.value}>
-                {userData?.createdAt
+                {/* {userData?.createdAt
                   ? userData.createdAt.toDate().toLocaleDateString()
-                  : "Not available"}
+                  : "Not available"} */}
               </Text>
 
               {userData?.progress && (

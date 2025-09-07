@@ -1,18 +1,18 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { View, Text, TouchableOpacity, Pressable, ActivityIndicator, Alert } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { auth, db } from "../../firebase/config";
-import {
-  doc,
-  getDoc,
-  updateDoc,
-  collection,
-  addDoc,
-  serverTimestamp,
-  deleteDoc,
-  getDocs,
-  deleteField,
-} from "firebase/firestore";
+// import { auth, db } from "../../firebase/config";
+// import {
+//   doc,
+//   getDoc,
+//   updateDoc,
+//   collection,
+//   addDoc,
+//   serverTimestamp,
+//   deleteDoc,
+//   getDocs,
+//   deleteField,
+// } from "firebase/firestore";
 import QadaaCalculator from "./QadaaCalculator";
 
 interface PrayerData {
@@ -114,30 +114,30 @@ export default function PrayerProgress() {
 
   const fetchPrayerData = useCallback(async () => {
     try {
-      const user = auth.currentUser;
-      if (!user) {
-        setError("User not authenticated");
-        setLoading(false);
-        return;
-      }
+      // const user = auth.currentUser;
+      // if (!user) {
+      //   setError("User not authenticated");
+      //   setLoading(false);
+      //   return;
+      // }
 
-      const userDocRef = doc(db, "users", user.uid);
-      const userDoc = await getDoc(userDocRef);
+      // const userDocRef = doc(db, "users", user.uid);
+      // const userDoc = await getDoc(userDocRef);
 
-      if (!userDoc.exists()) {
-        setError("No prayer data found.");
-        setLoading(false);
-        return;
-      }
+      // if (!userDoc.exists()) {
+      //   setError("No prayer data found.");
+      //   setLoading(false);
+      //   return;
+      // }
 
-      const userData = userDoc.data();
-      if (!userData.progress) {
-        setError("No prayer data found.");
-        setLoading(false);
-        return;
-      }
+      // const userData = userDoc.data();
+      // if (!userData.progress) {
+      //   setError("No prayer data found.");
+      //   setLoading(false);
+      //   return;
+      // }
 
-      setProgress(userData.progress as UserProgress);
+      // setProgress(userData.progress as UserProgress);
       setError(null);
       setLoading(false);
     } catch (err) {
@@ -153,40 +153,40 @@ export default function PrayerProgress() {
 
   const handleMarkDone = async (prayerName: string) => {
     try {
-      const user = auth.currentUser;
-      if (!user || !progress) return;
+      // const user = auth.currentUser;
+      // if (!user || !progress) return;
 
-      const prayerKey = prayerName.toLowerCase();
-      const currentPrayer = progress[prayerKey as keyof UserProgress];
+      // const prayerKey = prayerName.toLowerCase();
+      // const currentPrayer = progress[prayerKey as keyof UserProgress];
 
-      if (currentPrayer.done >= currentPrayer.total) return;
+      // if (currentPrayer.done >= currentPrayer.total) return;
 
       setUpdatingPrayer(prayerName);
 
       // Update progress in Firestore
-      const userDocRef = doc(db, "users", user.uid);
-      const updatedProgress = {
-        ...progress,
-        [prayerKey]: {
-          ...currentPrayer,
-          done: currentPrayer.done + 1,
-        },
-      };
+      // const userDocRef = doc(db, "users", user.uid);
+      // const updatedProgress = {
+      //   ...progress,
+      //   [prayerKey]: {
+      //     ...currentPrayer,
+      //     done: currentPrayer.done + 1,
+      //   },
+      // };
 
-      await updateDoc(userDocRef, {
-        [`progress.${prayerKey}.done`]: currentPrayer.done + 1,
-      });
+      // await updateDoc(userDocRef, {
+      //   [`progress.${prayerKey}.done`]: currentPrayer.done + 1,
+      // });
 
-      // Add log entry
-      const logsCollectionRef = collection(userDocRef, "logs");
-      await addDoc(logsCollectionRef, {
-        prayer: prayerKey,
-        timestamp: serverTimestamp(),
-        action: "mark_done",
-      });
+      // // Add log entry
+      // const logsCollectionRef = collection(userDocRef, "logs");
+      // await addDoc(logsCollectionRef, {
+      //   prayer: prayerKey,
+      //   timestamp: serverTimestamp(),
+      //   action: "mark_done",
+      // });
 
-      // Update local state for just this prayer
-      setProgress(updatedProgress);
+      // // Update local state for just this prayer
+      // setProgress(updatedProgress);
     } catch (err) {
       console.error("Error marking prayer as done:", err);
       Alert.alert("Error", "Failed to update prayer status");
@@ -209,24 +209,24 @@ export default function PrayerProgress() {
           style: "destructive",
           onPress: async () => {
             try {
-              const user = auth.currentUser;
-              if (!user) return;
+              // const user = auth.currentUser;
+              // if (!user) return;
 
-              setIsResetting(true);
+              // setIsResetting(true);
 
-              // Delete all logs first
-              const userDocRef = doc(db, "users", user.uid);
-              const logsCollectionRef = collection(userDocRef, "logs");
-              const logsSnapshot = await getDocs(logsCollectionRef);
+              // // Delete all logs first
+              // const userDocRef = doc(db, "users", user.uid);
+              // const logsCollectionRef = collection(userDocRef, "logs");
+              // const logsSnapshot = await getDocs(logsCollectionRef);
 
-              const deleteLogs = logsSnapshot.docs.map((doc) => deleteDoc(doc.ref));
-              await Promise.all(deleteLogs);
+              // const deleteLogs = logsSnapshot.docs.map((doc) => deleteDoc(doc.ref));
+              // await Promise.all(deleteLogs);
 
-              // Remove only prayer-related fields from user document
-              await updateDoc(userDocRef, {
-                progress: deleteField(),
-                qadaaInfo: deleteField(),
-              });
+              // // Remove only prayer-related fields from user document
+              // await updateDoc(userDocRef, {
+              //   progress: deleteField(),
+              //   qadaaInfo: deleteField(),
+              // });
 
               // Reset local state
               setProgress(null);

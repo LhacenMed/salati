@@ -1,32 +1,55 @@
+import "react-native-gesture-handler";
+
+// Global styles and utilities
 import "./global.css";
-import { DarkTheme, DefaultTheme, NavigationContainer } from "@react-navigation/native";
+
+// React and React Native core
+import { View, TouchableOpacity, Text } from "react-native";
+
+// Expo
 import { StatusBar } from "expo-status-bar";
+import * as SystemUI from "expo-system-ui";
+import { Ionicons } from "@expo/vector-icons";
+
+// React Navigation
+import { NavigationContainer, getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { createStackNavigator, TransitionPresets } from "@react-navigation/stack";
-import { useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { ActivityIndicator, View, StyleSheet } from "react-native";
-import TabLayout from "./app/tabs/_layout";
-import { ThemeProvider } from "./context/ThemeContext";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+
+// Third-party libraries
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+import * as NavigationBar from "expo-navigation-bar";
+// import { EventRegister } from "react-native-event-listeners";
+
+// Components
+// import TabBar from "./components/TabBar";
+
+// Contexts
+import { ThemeProvider, useThemeContext } from "./context/ThemeContext";
 import { LanguageProvider } from "context/LanguageContext";
+
+// Hooks
+import { useAppReady } from "./app/hooks/useAppReady";
+import { useAuth } from "./app/hooks/useAuth";
+
+// Auth Screens
 import LoginScreen from "./app/auth/LoginScreen";
 import SignupScreen from "./app/auth/SignupScreen";
 import WelcomeScreen from "./app/auth/WelcomeScreen";
-import { useAuth } from "./app/hooks/useAuth";
-import {
-  useFonts,
-  Inter_900Black,
-  Inter_600SemiBold,
-  Inter_700Bold,
-  Inter_400Regular,
-} from "@expo-google-fonts/inter";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import * as SystemUI from "expo-system-ui";
-import { EventRegister } from "react-native-event-listeners";
-import * as NavigationBar from "expo-navigation-bar";
-import { configureReanimatedLogger, ReanimatedLogLevel } from "react-native-reanimated";
+
+// App Screens
 import PrayersScreen from "./app/screens/PrayersScreen";
 import ProfileScreen from "./app/screens/ProfileScreen";
+
+// Tab Screens
+import Home from "./app/tabs/Home";
+import Explore from "./app/tabs/Explore";
+import Bookings from "./app/tabs/Bookings";
+import Settings from "./app/tabs/Settings";
+
+import React from "react";
 
 // Configure Reanimated logger to disable strict mode
 configureReanimatedLogger({
@@ -34,113 +57,339 @@ configureReanimatedLogger({
   strict: false,
 });
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  // Auth Screens
+  Welcome: undefined;
+  Login: undefined;
+  SignUp: undefined;
+  // App Screens
+  MainApp: undefined;
+  Prayers: undefined;
+  Profile: undefined;
+};
 
-function InsideLayout() {
+const Tab = createMaterialTopTabNavigator();
+const RootStack = createStackNavigator<RootStackParamList>();
+
+// Material Top Tabs Navigator
+const TopTabsNavigator = () => {
+  const { theme } = useThemeContext();
+  const isDark = theme === "dark";
+
   return (
-    <Stack.Navigator
+    <Tab.Navigator
+      tabBarPosition="bottom"
+      initialRouteName="Home"
+      // comment if you want to use the default tab bar
+      // tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
+        tabBarStyle: {
+          position: "relative",
+          backgroundColor: isDark ? "hsl(0 0% 4%)" : "hsl(0 0% 100%)",
+          borderTopColor: isDark ? "hsl(0 0% 15%)" : "hsl(0 0% 90%)",
+          borderTopWidth: 1,
+          paddingVertical: 10,
+        },
+        tabBarActiveTintColor: "black",
+        // tabBarLabelStyle: { fontSize: 20 },
+        tabBarShowIcon: true,
+        tabBarShowLabel: false,
+        tabBarIndicatorStyle: { display: "none" },
+        tabBarPressColor: isDark ? "hsl(0 0% 15%)" : "hsl(0 0% 90%)",
+        swipeEnabled: true, // Controlled by FeaturesContext
+        animationEnabled: false, // Make swipe animation disabled when pressing a tab button
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={Home}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "home" : "home-outline"}
+              size={24}
+              color={focused ? "#8438ff" : "#666"}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Explore"
+        component={Explore}
+        options={{
+          tabBarLabel: "Explore",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "compass" : "compass-outline"}
+              size={24}
+              color={focused ? "#8438ff" : "#666"}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Bookings"
+        component={Bookings}
+        options={{
+          tabBarLabel: "Bookings",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "calendar" : "calendar-outline"}
+              size={24}
+              color={focused ? "#8438ff" : "#666"}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={Settings}
+        options={{
+          tabBarLabel: "Settings",
+          tabBarIcon: ({ focused }) => (
+            <Ionicons
+              name={focused ? "settings" : "settings-outline"}
+              size={24}
+              color={focused ? "#8438ff" : "#666"}
+            />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
+
+// Create header right component to avoid hook call in options
+const HeaderRight = () => {
+  const { theme } = useThemeContext();
+  const isDark = theme === "dark";
+
+  return (
+    <View className="mr-4 flex-row items-center space-x-3">
+      <TouchableOpacity className="p-2">
+        <Ionicons name="search" size={22} color={isDark ? "#fff" : "#000"} />
+      </TouchableOpacity>
+      <TouchableOpacity className="p-2">
+        <Ionicons name="ellipsis-vertical" size={22} color={isDark ? "#fff" : "#000"} />
+      </TouchableOpacity>
+    </View>
+  );
+};
+
+// Screen configurations
+const getAuthenticatedScreens = (isDark: boolean) => {
+  return [
+    <RootStack.Screen
+      key="MainApp"
+      name="MainApp"
+      component={TopTabsNavigator}
+      options={({ route }: any) => {
+        const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+        return {
+          headerShown: true,
+          headerTitle: routeName,
+          headerTitleStyle: {
+            fontWeight: "bold",
+            fontSize: 20,
+            color: isDark ? "#fff" : "#000",
+          },
+          headerStyle: {
+            backgroundColor: isDark ? "hsl(0 0% 4%)" : "hsl(0 0% 100%)",
+            elevation: 0,
+            shadowOpacity: 0,
+            borderBottomWidth: 1,
+            borderBottomColor: isDark ? "hsl(0 0% 15%)" : "hsl(0 0% 90%)",
+            height: 90,
+          },
+          headerLeft: () => null,
+          headerRight: () => <HeaderRight />,
+          ...TransitionPresets.SlideFromRightIOS,
+        };
+      }}
+    />,
+    <RootStack.Screen
+      key="Prayers"
+      name="Prayers"
+      component={PrayersScreen}
+      options={{
         headerShown: false,
         ...TransitionPresets.SlideFromRightIOS,
       }}
-    >
-      <Stack.Screen name="Tabs" component={TabLayout} />
-      <Stack.Screen name="Prayers" component={PrayersScreen} />
-      <Stack.Screen name="Profile" component={ProfileScreen} />
-    </Stack.Navigator>
+    />,
+    <RootStack.Screen
+      key="Profile"
+      name="Profile"
+      component={ProfileScreen}
+      options={{
+        headerShown: false,
+        ...TransitionPresets.ModalPresentationIOS,
+      }}
+    />,
+  ];
+};
+
+const getUnauthenticatedScreens = (isDark: boolean) => [
+  <RootStack.Screen
+    key="Welcome"
+    name="Welcome"
+    component={WelcomeScreen}
+    options={{
+      headerShown: false,
+      ...TransitionPresets.ModalSlideFromBottomIOS,
+    }}
+  />,
+  <RootStack.Screen
+    key="Login"
+    name="Login"
+    component={LoginScreen}
+    options={{
+      headerShown: false,
+      ...TransitionPresets.SlideFromRightIOS,
+    }}
+  />,
+  <RootStack.Screen
+    key="SignUp"
+    name="SignUp"
+    component={SignupScreen}
+    options={{
+      headerShown: false,
+      ...TransitionPresets.SlideFromRightIOS,
+    }}
+  />,
+];
+
+const getSharedScreens = (isDark: boolean) => [
+  <RootStack.Screen
+    key="MainApp"
+    name="MainApp"
+    component={TopTabsNavigator}
+    options={({ route }: any) => {
+      const routeName = getFocusedRouteNameFromRoute(route) ?? "Home";
+      return {
+        headerShown: true,
+        headerTitle: routeName,
+        headerTitleStyle: {
+          fontWeight: "bold",
+          fontSize: 20,
+          color: isDark ? "#fff" : "#000",
+        },
+        headerStyle: {
+          backgroundColor: isDark ? "hsl(0 0% 4%)" : "hsl(0 0% 100%)",
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 1,
+          borderBottomColor: isDark ? "hsl(0 0% 15%)" : "hsl(0 0% 90%)",
+          height: 90,
+        },
+        headerLeft: () => null,
+        headerRight: () => <HeaderRight />,
+        ...TransitionPresets.SlideFromRightIOS,
+      };
+    }}
+  />,
+];
+
+// Main Navigation Component
+const AppNavigator = () => {
+  const { user } = useAuth();
+  const { theme } = useThemeContext();
+  const isDark = theme === "dark";
+
+  return (
+    <NavigationContainer>
+      <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        {/* {user ? (
+          // Authenticated user screens
+          <>
+            {getAuthenticatedScreens(isDark)}
+            {getSharedScreens(isDark)}
+          </>
+        ) : (
+          // Unauthenticated user screens
+          <>
+            {getUnauthenticatedScreens(isDark)}
+            {getSharedScreens(isDark)}
+          </>
+        )} */}
+        {getAuthenticatedScreens(isDark)}
+      </RootStack.Navigator>
+    </NavigationContainer>
   );
+};
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean; error?: Error }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error("App Error Boundary caught an error:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
+          <Text style={{ fontSize: 18, textAlign: "center", marginBottom: 20 }}>
+            Something went wrong. Please restart the app.
+          </Text>
+          <Text style={{ fontSize: 14, textAlign: "center", color: "#666" }}>
+            {this.state.error?.message}
+          </Text>
+        </View>
+      );
+    }
+
+    return this.props.children;
+  }
 }
 
-function AuthStack() {
+// App Initialization Component
+const AppContent = () => {
+  const { isReady } = useAppReady();
+
+  // Don't render anything until app is ready
+  if (!isReady) {
+    return null;
+  }
+
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        ...TransitionPresets.SlideFromRightIOS,
-      }}
-    >
-      <Stack.Screen name="Welcome" component={WelcomeScreen} />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="Signup" component={SignupScreen} />
-    </Stack.Navigator>
+    <ErrorBoundary>
+      <AppNavigator />
+    </ErrorBoundary>
   );
-}
+};
 
 export default function App() {
-  const [darkMode, setDarkMode] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [appReady, setAppReady] = useState(false);
-  const { user, isLoading: authLoading } = useAuth();
+  React.useEffect(() => {
+    SystemUI.setBackgroundColorAsync("#1e1e1e");
+  }, []);
 
-  useEffect(() => {
-    const listener = EventRegister.addEventListener("ChangeTheme", (data) => {
-      setDarkMode(data);
-    });
-
-    return () => {
-      EventRegister.removeAllListeners();
-    };
-  }, [darkMode]);
-
-  SystemUI.setBackgroundColorAsync("#1e1e1e");
-
-  const [fontsLoaded, fontError] = useFonts({
-    Inter: Inter_400Regular,
-    InterSemi: Inter_600SemiBold,
-    InterBold: Inter_700Bold,
-    InterBlack: Inter_900Black,
-  });
-
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      setAppReady(true);
-      setLoading(false);
-    }
-  }, [fontsLoaded, fontError]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     NavigationBar.setPositionAsync("absolute");
     NavigationBar.setBackgroundColorAsync("#ffffff00");
   }, []);
 
-  if (loading || !appReady || authLoading) {
-    return (
-      <View style={[styles.centered, { backgroundColor: "#171717" }]}>
-        <ActivityIndicator size="large" color="#8438ff" />
-      </View>
-    );
-  }
-
   return (
     <LanguageProvider>
-      <GestureHandlerRootView style={styles.container}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <ThemeProvider>
-            <StatusBar style={darkMode ? "light" : "dark"} />
-            <NavigationContainer theme={darkMode ? DarkTheme : DefaultTheme}>
-              <Stack.Navigator screenOptions={{ headerShown: false }}>
-                {user ? (
-                  <Stack.Screen name="Inside" component={InsideLayout} />
-                ) : (
-                  <Stack.Screen name="Auth" component={AuthStack} />
-                )}
-              </Stack.Navigator>
-            </NavigationContainer>
+            <StatusBar style="auto" translucent />
+            <AppContent />
           </ThemeProvider>
         </SafeAreaProvider>
       </GestureHandlerRootView>
     </LanguageProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#171717",
-  },
-  centered: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-});

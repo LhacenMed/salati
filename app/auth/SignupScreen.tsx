@@ -8,9 +8,9 @@ import {
   ActivityIndicator,
   Alert,
 } from "react-native";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../../firebase/config";
-import { doc, setDoc, serverTimestamp } from "firebase/firestore";
+// import { createUserWithEmailAndPassword } from "firebase/auth";
+// import { auth, db } from "../../firebase/config";
+// import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { useNavigation } from "@react-navigation/native";
 import { StackNavigationProp } from "@react-navigation/stack";
 
@@ -49,15 +49,15 @@ export default function SignupScreen() {
     try {
       setLoading(true);
       // Create the user account
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Create a user document in Firestore
-      const userDocRef = doc(db, "users", userCredential.user.uid);
-      await setDoc(userDocRef, {
-        name: name,
-        email: email,
-        createdAt: serverTimestamp(),
-      });
+      // // Create a user document in Firestore
+      // const userDocRef = doc(db, "users", userCredential.user.uid);
+      // await setDoc(userDocRef, {
+      //   name: name,
+      //   email: email,
+      //   createdAt: serverTimestamp(),
+      // });
     } catch (error: any) {
       Alert.alert("Error", error.message);
     } finally {

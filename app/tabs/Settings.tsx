@@ -5,7 +5,7 @@ import MenuItem from "../../components/ui/MenuItem";
 import ColorSchemePopup from "../../components/ui/ColorSchemePopup";
 import { ThemeContext } from "context/ThemeContext";
 import { ThemeMode } from "context/ThemeContext";
-import { auth } from "firebase/config";
+// import { auth } from "firebase/config";
 import { useAuth } from "../hooks/useAuth";
 
 const Page = () => {
@@ -46,7 +46,7 @@ const Page = () => {
           <MenuItem
             icon="mail-outline"
             title="Email"
-            value={user?.email || "No email"}
+            // value={user?.email || "No email"}
             isFirst
             isLast={false}
             showValue={true}
@@ -55,7 +55,7 @@ const Page = () => {
           <MenuItem
             icon="logo-google"
             title="Google"
-            value={user?.email?.endsWith("@gmail.com") ? "Connected" : "Not connected"}
+            // value={user?.email?.endsWith("@gmail.com") ? "Connected" : "Not connected"}
             isFirst={false}
             isLast
             showValue={true}
@@ -129,7 +129,7 @@ const Page = () => {
             isFirst
             showChevron={false}
             onPress={() => {
-              auth.signOut();
+              // auth.signOut();
             }}
           />
           <MenuItem
