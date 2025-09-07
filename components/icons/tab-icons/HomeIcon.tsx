@@ -1,7 +1,7 @@
 import React from "react";
 import Svg, { Path } from "react-native-svg";
 import { useState, useContext } from "react";
-import { ThemeContext } from "../../context/ThemeContext";
+import { ThemeContext } from "../../../context/ThemeContext";
 
 interface HomeIconProps {
   isFocused: boolean;
@@ -9,16 +9,10 @@ interface HomeIconProps {
   height?: number;
 }
 
-const HomeIcon: React.FC<HomeIconProps> = ({
-  isFocused,
-  width = 24,
-  height = 24,
-  ...props
-}) => {
+const HomeIcon: React.FC<HomeIconProps> = ({ isFocused, width = 24, height = 24, ...props }) => {
   const { theme } = useContext(ThemeContext);
   const fillColor = theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)";
-  const strokeColor =
-    theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
+  const strokeColor = theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
   return (
     <Svg width={width} height={height} viewBox="0 0 24 24" {...props}>
       {isFocused ? (
@@ -40,12 +34,7 @@ const HomeIcon: React.FC<HomeIconProps> = ({
             strokeWidth="2"
             fill="rgba(0, 0, 0, 0)"
           />
-          <Path
-            d="M15 18H9"
-            stroke={strokeColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+          <Path d="M15 18H9" stroke={strokeColor} strokeWidth="2" strokeLinecap="round" />
         </>
       )}
     </Svg>

@@ -50,6 +50,7 @@ import Bookings from "./app/tabs/Bookings";
 import Settings from "./app/tabs/Settings";
 
 import React from "react";
+import TabBar from "components/TabBar";
 
 // Configure Reanimated logger to disable strict mode
 configureReanimatedLogger({
@@ -81,7 +82,7 @@ const TopTabsNavigator = () => {
       tabBarPosition="bottom"
       initialRouteName="Home"
       // comment if you want to use the default tab bar
-      // tabBar={(props) => <TabBar {...props} />}
+      tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         tabBarStyle: {
           position: "relative",

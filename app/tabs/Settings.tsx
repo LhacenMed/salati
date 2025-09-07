@@ -1,20 +1,20 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, SafeAreaView, StatusBar, ScrollView } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 import MenuItem from "../../components/ui/MenuItem";
 import ColorSchemePopup from "../../components/ui/ColorSchemePopup";
 import { ThemeContext } from "context/ThemeContext";
 import { ThemeMode } from "context/ThemeContext";
-// import { auth } from "firebase/config";
-import { useAuth } from "../hooks/useAuth";
 
 const Page = () => {
-  const insets = useSafeAreaInsets();
   const [modalVisible, setModalVisible] = useState(false);
   const themes = useContext(ThemeContext);
-  const { user } = useAuth();
   const backgroundColor = themes.theme === "dark" ? "#171717" : "rgb(249, 249, 249)";
-  const headerTextColor = themes.theme === "dark" ? "rgb(249, 249, 249)" : "#171717";
 
   const handleColorSchemeSelect = (scheme: string) => {
     // Update the theme when a new scheme is selected
@@ -23,21 +23,9 @@ const Page = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar
-        barStyle={themes.theme === "dark" ? "light-content" : "dark-content"}
-        backgroundColor={themes.theme === "dark" ? "#171717" : "rgb(249, 249, 249)"}
-      />
-      <View style={[styles.header, { top: insets.top, backgroundColor: backgroundColor }]}>
-        <View style={styles.headerLeftContainer} />
-        <View style={styles.headerTitleContainer}>
-          <Text style={[styles.headerTitle, { color: headerTextColor }]}>Settings</Text>
-        </View>
-        <View style={styles.headerRightContainer} />
-      </View>
-
       <ScrollView
-        style={[styles.scrollViewContainer, { top: insets.top, backgroundColor: backgroundColor }]}
-        contentContainerStyle={{ paddingTop: 60 }}
+        style={[styles.scrollViewContainer, { backgroundColor: backgroundColor }]}
+        contentContainerStyle={{ paddingTop: 20 }}
         scrollEnabled={!modalVisible}
       >
         {/* Profile Section */}
@@ -165,7 +153,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     padding: 16,
-    paddingTop: 5,
     backgroundColor: "#171717",
     zIndex: 1,
     elevation: 3,

@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Svg, { G, Path } from "react-native-svg";
-import { ThemeContext } from "../../context/ThemeContext";
+import { ThemeContext } from "../../../context/ThemeContext";
 
 interface ExploreIconProps {
   isFocused: boolean;
@@ -19,8 +19,7 @@ const ExploreIcon: React.FC<ExploreIconProps> = ({
 }) => {
   const { theme } = useContext(ThemeContext);
   const fillColor = theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)";
-  const strokeColor =
-    theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
+  const strokeColor = theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
   return (
     <>
       {isFocused ? (

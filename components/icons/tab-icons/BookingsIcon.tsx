@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Svg, { Path } from "react-native-svg";
-import { ThemeContext } from "../../context/ThemeContext";
+import { ThemeContext } from "../../../context/ThemeContext";
 
 interface BookingsIconProps {
   isFocused: boolean;
@@ -17,8 +17,7 @@ const BookingsIcon: React.FC<BookingsIconProps> = ({
 }) => {
   const { theme } = useContext(ThemeContext);
   const fillColor = theme === "dark" ? "rgb(255, 255, 255)" : "rgb(0, 0, 0)";
-  const strokeColor =
-    theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
+  const strokeColor = theme === "dark" ? "rgb(124, 124, 124)" : "rgb(124, 124, 124)";
   return (
     <>
       {isFocused ? (
@@ -41,12 +40,7 @@ const BookingsIcon: React.FC<BookingsIconProps> = ({
             stroke={strokeColor}
             strokeWidth="2"
           />
-          <Path
-            d="M15 6H9"
-            stroke={strokeColor}
-            strokeWidth="2"
-            strokeLinecap="round"
-          />
+          <Path d="M15 6H9" stroke={strokeColor} strokeWidth="2" strokeLinecap="round" />
         </Svg>
       )}
     </>

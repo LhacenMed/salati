@@ -1,253 +1,172 @@
-import { View, StyleSheet, LayoutChangeEvent, Platform } from 'react-native';
-import { BottomTabBarProps, BottomTabNavigationOptions } from '@react-navigation/bottom-tabs';
-import TabBarButton from './ui/TabBarButton';
-import { useState, useContext, useEffect, useMemo } from 'react';
-import Animated, {
-  ReduceMotion,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-  interpolate,
-} from 'react-native-reanimated';
-import { BlurView } from 'expo-blur';
-import { ThemeContext } from '../context/ThemeContext';
-// import { useTabBar } from "../context/TabBarContext";
+import React, { useContext } from "react";
+import { View, TouchableOpacity, Animated, Dimensions } from "react-native";
+import { Tooltip } from "react-native-paper";
+// import { useTheme } from "@/contexts/ThemeContext";
+import HomeIcon from "./icons/tab-icons/HomeIcon";
+import ExploreIcon from "./icons/tab-icons/ExploreIcon";
+import BookingsIcon from "./icons/tab-icons/BookingsIcon";
+import SettingsIcon from "./icons/tab-icons/SettingsIcon";
+import { Canvas, BackdropBlur } from "@shopify/react-native-skia";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ThemeContext } from "../context/ThemeContext";
 
-interface CustomTabNavigationOptions extends BottomTabNavigationOptions {
-  blurEnabled?: boolean;
+const { width: screenWidth } = Dimensions.get("window");
+
+interface TabBarProps {
+  state: any;
+  // descriptors: any;
+  navigation: any;
 }
 
-interface PopupState {
-  label: string;
-  index: number;
-  timeoutId?: NodeJS.Timeout;
-  opacity: Animated.SharedValue<number>;
-}
-
-export default function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+const TabBar: React.FC<TabBarProps> = ({
+  state,
+  // descriptors,
+  navigation,
+}) => {
+  // const { isDark } = useTheme();
+  const animatedValues = React.useRef(state.routes.map(() => new Animated.Value(0))).current;
   const { theme } = useContext(ThemeContext);
-  // const { isTabBarVisible } = useTabBar();
-  const translateY = useSharedValue(0);
-  const [activePopups, setActivePopups] = useState<{ label: string; index: number }[]>([]);
-  const [dimensions, setDimensions] = useState({ height: 20, width: 100 });
-  const buttonWidth = dimensions.width / state.routes.length;
 
-  // Create shared values at the top level
-  const popupOpacities = state.routes.map(() => useSharedValue(0));
-
-  const popupStyles = state.routes.map((_, index) =>
-    useAnimatedStyle(() => ({
-      opacity: popupOpacities[index].value,
-      transform: [
-        {
-          translateY: interpolate(popupOpacities[index].value, [0, 1], [10, 0]),
-        },
-        { translateX: index * buttonWidth + buttonWidth / 2 - 50 },
-      ],
-    }))
-  );
-
-  // useEffect(() => {
-  //   translateY.value = withTiming(isTabBarVisible ? 0 : 100, {
-  //     duration: 200,
-  //   });
-  // }, [isTabBarVisible]);
-
-  const backgroundColor = theme === 'dark' ? '#121212' : '#fff';
-  const borderTopColor = theme === 'dark' ? '#1E1E1E' : '#eee';
-
-  const tabPositionX = useSharedValue(0);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: tabPositionX.value }],
-  }));
-
-  const slideAnimation = useAnimatedStyle(() => {
-    return {
-      transform: [{ translateY: translateY.value }],
-    };
-  });
-
-  const handleLongPress = (index: number, label: string) => {
-    popupOpacities[index].value = withTiming(1, { duration: 200 });
-    setActivePopups((prev) => [...prev, { label, index }]);
+  const animateTab = (index: number, focused: boolean) => {
+    Animated.spring(animatedValues[index], {
+      toValue: focused ? -5 : 5,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
   };
 
-  const handlePressOut = (index: number) => {
-    setTimeout(() => {
-      popupOpacities[index].value = withTiming(0, { duration: 200 });
-      setActivePopups((prev) => prev.filter((popup) => popup.index !== index));
-    }, 2000);
-  };
-
-  const onTabbarLayout = (e: LayoutChangeEvent) => {
-    setDimensions({
-      height: e.nativeEvent.layout.height,
-      width: e.nativeEvent.layout.width,
+  React.useEffect(() => {
+    state.routes.forEach((route: any, index: number) => {
+      const isFocused = state.index === index;
+      animateTab(index, isFocused);
     });
+  }, [state.index]);
+
+  const renderIcon = (routeName: string, isFocused: boolean) => {
+    const iconProps = { isFocused, width: 24, height: 24 };
+    switch (routeName) {
+      case "Home":
+        return <HomeIcon {...iconProps} />;
+      case "Explore":
+        return <ExploreIcon {...iconProps} />;
+      case "Bookings":
+        return <BookingsIcon {...iconProps} />;
+      case "Settings":
+        return <SettingsIcon {...iconProps} />;
+      default:
+        return <HomeIcon {...iconProps} />;
+    }
   };
 
-  const blurEnabled =
-    Platform.OS === 'ios' &&
-    (descriptors[state.routes[state.index].key]?.options as CustomTabNavigationOptions).blurEnabled;
+  const getTooltipText = (routeName: string) => {
+    switch (routeName) {
+      case "Home":
+        return "Home";
+      case "Explore":
+        return "Explore";
+      case "Bookings":
+        return "Bookings";
+      case "Settings":
+        return "Settings";
+      default:
+        return routeName;
+    }
+  };
 
-  const TabBarContent = (
-    <View onLayout={onTabbarLayout} style={[styles.tabbar, { backgroundColor }]}>
-      <Animated.View
-        style={[
-          animatedStyle,
-          {
-            position: 'absolute',
-            borderRadius: 30,
-            marginHorizontal: 8,
-            height: dimensions.height - 15,
-            width: buttonWidth - 15,
-          },
-        ]}
-      />
-      {/* Popups Container */}
-      {/* <View style={styles.popupsContainer}>
-        {activePopups.map((popup) => (
-          <Animated.View
-            key={popup.index}
-            style={[
-              styles.popup,
-              { backgroundColor: theme === "dark" ? "#2A2A2A" : "#FFFFFF" },
-              popupStyles[popup.index],
-            ]}
-          >
-            <Animated.Text
-              style={[
-                styles.popupText,
-                { color: theme === "dark" ? "#fff" : "#000" },
-              ]}
+  const insets = useSafeAreaInsets();
+
+  // Calculate tab bar height (padding + content + safe area)
+  const tabBarHeight = 70 + insets.bottom; // Adjust based on your actual tab bar height
+
+  return (
+    <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 1000 }}>
+      {/* Backdrop Blur Canvas - positioned to capture screen content behind */}
+      <Canvas
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          width: screenWidth,
+          height: tabBarHeight,
+        }}
+      >
+        <BackdropBlur blur={2} clip={{ x: 0, y: 0, width: screenWidth, height: tabBarHeight }}>
+          {/* Semi-transparent overlay for frosted glass effect */}
+          {/* <Fill color="rgba(0, 0, 0, .9)" /> */}
+        </BackdropBlur>
+      </Canvas>
+
+      {/* Tab Bar Content */}
+      <View
+        className="border-border flex-row border-t"
+        style={{
+          backgroundColor: "transparent",
+          paddingBottom: insets.bottom,
+        }}
+      >
+        {state.routes.map((route: any, index: number) => {
+          // const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
+
+          const onPress = () => {
+            const event = navigation.emit({
+              type: "tabPress",
+              target: route.key,
+              canPreventDefault: true,
+            });
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+
+          return (
+            <View
+              key={route.key}
+              style={{
+                flex: 1,
+                paddingVertical: 15,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {popup.label}
-            </Animated.Text>
-          </Animated.View>
-        ))}
-      </View> */}
-      {/* End of Popups Container */}
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const label =
-          typeof options.tabBarLabel === 'string'
-            ? options.tabBarLabel
-            : options.title !== undefined
-              ? options.title
-              : route.name;
-
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          tabPositionX.value = withSpring(buttonWidth * index, {
-            stiffness: 250,
-            damping: 23,
-            mass: 1,
-            overshootClamping: false,
-            restDisplacementThreshold: 0.01,
-            restSpeedThreshold: 2,
-            reduceMotion: ReduceMotion.System,
-          });
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name, route.params);
-          }
-        };
-
-        const onLongPress = () => {
-          handleLongPress(index, label);
-          navigation.emit({
-            type: 'tabLongPress',
-            target: route.key,
-          });
-        };
-
-        return (
-          <TabBarButton
-            key={route.name}
-            onPress={onPress}
-            onLongPress={onLongPress}
-            onPressOut={() => handlePressOut(index)}
-            isFocused={isFocused}
-            routeName={route.name as 'Home' | 'Explore' | 'Bookings' | 'Settings'}
-            label={label}
-          />
-        );
-      })}
+              <Tooltip
+                title={getTooltipText(route.name)}
+                enterTouchDelay={500}
+                leaveTouchDelay={1000}
+              >
+                <TouchableOpacity onPress={onPress} activeOpacity={1}>
+                  <Animated.View
+                    className="items-center justify-center"
+                    style={{
+                      transform: [{ translateY: animatedValues[index] }],
+                    }}
+                  >
+                    {renderIcon(route.name, isFocused)}
+                  </Animated.View>
+                  <Animated.Text
+                    className="text-foreground text-center text-xs font-medium"
+                    style={{
+                      opacity: animatedValues[index].interpolate({
+                        inputRange: [-5, 0],
+                        outputRange: [1, 0],
+                      }),
+                      transform: [{ translateY: 4 }],
+                      color: theme === "dark" ? "white" : "black",
+                    }}
+                  >
+                    {route.name}
+                  </Animated.Text>
+                </TouchableOpacity>
+              </Tooltip>
+            </View>
+          );
+        })}
+      </View>
     </View>
   );
+};
 
-  const AnimatedBlurView = Animated.createAnimatedComponent(BlurView);
-
-  return blurEnabled ? (
-    // <AnimatedBlurView
-    //   intensity={50}
-    //   tint="light"
-    //   experimentalBlurMethod="dimezisBlurView"
-    //   style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
-    //   {TabBarContent}
-    // </AnimatedBlurView>
-    <Animated.View style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
-      {TabBarContent}
-    </Animated.View>
-  ) : (
-    <Animated.View style={[styles.blurView, { borderTopColor: borderTopColor }, slideAnimation]}>
-      {TabBarContent}
-    </Animated.View>
-  );
-}
-
-const styles = StyleSheet.create({
-  blurView: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    overflow: 'hidden',
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-  },
-  tabbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 10,
-    paddingBottom: 20,
-    marginBottom: Platform.OS === 'ios' ? 15 : 0,
-  },
-  popup: {
-    position: 'absolute',
-    bottom: 100,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-    left: 11,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  popupText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  popupsContainer: {
-    position: 'absolute',
-    bottom: 120,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-  },
-});
+export default TabBar;
