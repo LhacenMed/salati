@@ -104,8 +104,8 @@ export default function ProfileScreen() {
   // const firestore = getFirestore();
 
   // Cloudinary configuration using environment variables
-  const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
-  const CLOUDINARY_UPLOAD_PRESET = NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  // const CLOUDINARY_URL = `https://api.cloudinary.com/v1_1/${NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`;
+  // const CLOUDINARY_UPLOAD_PRESET = NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
   // Fetch prayer times from Aladhan API
   const fetchPrayerTimes = async () => {
@@ -353,32 +353,32 @@ export default function ProfileScreen() {
     setUploading(true);
     try {
       // Create form data for upload
-      const formData = new FormData();
-      formData.append("file", {
-        uri,
-        type: "image/jpeg",
-        name: "upload.jpg",
-      } as any);
-      formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
+      // const formData = new FormData();
+      // formData.append("file", {
+      //   uri,
+      //   type: "image/jpeg",
+      //   name: "upload.jpg",
+      // } as any);
+      // formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET);
 
-      // Upload to Cloudinary
-      const response = await fetch(CLOUDINARY_URL, {
-        method: "POST",
-        body: formData,
-      });
+      // // Upload to Cloudinary
+      // const response = await fetch(CLOUDINARY_URL, {
+      //   method: "POST",
+      //   body: formData,
+      // });
 
-      const data = await response.json();
+      // const data = await response.json();
 
-      if (data.secure_url) {
-        // Update Firestore with new photo URL
-        // const userRef = doc(firestore, "users", auth.currentUser.uid);
-        // await updateDoc(userRef, {
-        //   photoURL: data.secure_url,
-        // });
+      // if (data.secure_url) {
+      //   // Update Firestore with new photo URL
+      //   // const userRef = doc(firestore, "users", auth.currentUser.uid);
+      //   // await updateDoc(userRef, {
+      //   //   photoURL: data.secure_url,
+      //   // });
 
-        // Update local state
-        setUserData((prev) => (prev ? { ...prev, photoURL: data.secure_url } : null));
-      }
+      //   // Update local state
+      //   setUserData((prev) => (prev ? { ...prev, photoURL: data.secure_url } : null));
+      // }
     } catch (error) {
       console.error("Error uploading image:", error);
       Alert.alert("Error", "Failed to upload image");

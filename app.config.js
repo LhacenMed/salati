@@ -19,6 +19,14 @@ export default {
                     },
                 },
             ],
+            [
+                "expo-build-properties",
+                {
+                    android: {
+                        minSdkVersion: 24,
+                    },
+                },
+            ],
             // "@react-native-firebase/app",
             // "@react-native-firebase/auth",
             // "@react-native-google-signin/google-signin",
